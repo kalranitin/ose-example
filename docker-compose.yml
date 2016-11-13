@@ -1,0 +1,16 @@
+version: '2'
+services:
+  assignment-web:
+    build:
+      context: .
+      dockerfile: assignment-webapp/Dockerfile
+    ports: 
+      - "8080:8080"
+    depends_on:
+      - assignment-app
+  assignment-app:
+    build:
+      context: .
+      dockerfile: assignment/Dockerfile
+    ports:
+      - "8081:8081"

@@ -1,0 +1,17 @@
+
+<div class="form-inline">
+    Guess the number : <input type="number" class="form-control" ng-model="guessed_number" required />
+    
+    <button ng-click="validateGuessedNumber()" class="btn btn-small btn-primary"> Guess !!! </button>
+    <br/>
+    
+    <span>Your previous results:</span>
+    <ul>
+        <li ng-repeat="guess in guessResult">{{ guess.resultCode }} - {{ guess.resultMsg }}</li>
+    </ul>
+    
+    <br />
+    
+    <a ng-click="playAgain()" class="btn btn-default btn-lg">Play Again</a>
+    
+</div>

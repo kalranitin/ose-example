@@ -1,0 +1,22 @@
+filebeat:
+  prospectors:
+    -
+#      paths:
+#        - "*.log"
+      input_type: stdin
+      exclude_files: [".gz$"]
+      multiline:
+        pattern: "^[[:space:]]+(at|...)|^Caused by:"
+        negate: false
+        match: after
+shipper:
+  name: "LOG_SHIPPER_TAG"
+  tags: ["LOG_SHIPPER_TAG"]
+output:
+  logstash:
+    hosts: ["LOG_FORWARD_HOST"]
+    bulk_max_size: 1024
+    index: "ES_INDEX"
+#runoptions:
+#  uid: "1010"
+#  gid: "1010"

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Number Guessing Game New</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        	body {
+			  padding-top: 50px;
+			}
+			.starter-template {
+			  padding: 40px 15px;
+			  text-align: center;
+			}
+        </style>
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css"/>
+    </head>
+    <body>
+    
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><img src="images/CALogo.png" class="img-thumbnail"></img>&nbsp;&nbsp; Number Guessing Game</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div ng-app="factoryApp" class="starter-template">
+        <h1>Guess the number</h1>
+        <p class="lead">A web Application based guessing game where the player enters a number from 1-20 and then the computer tells him whether he is right or wrong.
+        <br/>
+        
+        Front end is in Angular JS and backend is a Jersey service hosted on a remote server (on another pod) acting like a web service. THe internal communication is done via local proxy.</p>
+        
+        <div ng-view=""></div>
+        
+      </div>
+
+    </div>
+    
+    
+        <script src="bower_components/jquery/dist/jquery.js"></script>
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="bower_components/angular-resource/angular-resource.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script>
+            var factoryApp = angular.module('factoryApp',['ngRoute','ngResource'])
+                    .factory('guessNumberFactory', ['$resource',
+                    	function($resource){
+                        var guessNumberGuessResultFactory = {};
+                        
+                        guessNumberGuessResultFactory.getGuessResult = function(){
+                            return [];
+                        };
+                        
+                        return guessNumberGuessResultFactory;
+                    }])
+                    .factory('GuessAPIFactory', ['$resource',
+						function($resource){
+							return $resource('/api/playgame/:guessApi', {guessApi:'@guessApi'});						
+					}])
+					.controller('GuessNumberIndexPageCtrl',function($scope, guessNumberFactory, GuessAPIFactory, $location){
+                    	$scope.token = GuessAPIFactory.get({guessApi:'token'});
+                        $scope.startGame = function(){
+                        	$location.path('/startgame/'+$scope.token.token);
+                        };
+                    })
+                    .controller('GuessNumberGameCtrl',function($scope, $routeParams, $resource, $http, $location, guessNumberFactory, GuessAPIFactory){
+                    	$scope.guessed_number = 0;
+                    	$scope.token = $routeParams.token;
+                        $scope.guessResult = guessNumberFactory.getGuessResult();
+                        $scope.validateGuessedNumber = function(){
+                        	     $http({method: 'GET', url: '/api/playgame/guess?token='+$scope.token+'&guessedNumber='+$scope.guessed_number}).
+								    success(function(data, status, headers, config) {
+								    	$scope.guessResult.push(data);
+								    });
+                        };
+                        
+                        $scope.playAgain = function(){
+                        	$location.path('/');
+                        };
+                        
+                    })
+                    .config(function($routeProvider){
+                        $routeProvider.when('/',{
+                            controller:'GuessNumberIndexPageCtrl',
+                            templateUrl:'startGame.html'
+                        })
+                        .when('/startgame/:token',{
+                            controller:'GuessNumberGameCtrl',
+                            templateUrl:'guessResult.html'
+                        })
+                        .otherwise({redirectTo:'/'});
+                    });
+                            
+        </script>
+    </body>
+</html>

@@ -1,0 +1,12 @@
+version: '2'
+services:
+  assignment-web:
+    image: oseexample_assignment-web
+    ports: 
+      - "8080:8080"
+    depends_on:
+      - assignment-app
+  assignment-app:
+    image: oseexample_assignment-app
+    ports:
+      - "8081:8081"
